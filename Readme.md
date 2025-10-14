@@ -48,7 +48,7 @@ pip install -r requirements.txt
 **cd** into the current directory and run the script.
 
 ```commandline
-flask --app app.py run --debug
+flask --app app.py run --debugger --reload
 ```
 Click [here](https://geekpython.in/run-flask-app-from-the-command-line-in-windows) to get the detailed guide on running the Flask app from the command line.
 
