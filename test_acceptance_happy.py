@@ -3,6 +3,37 @@
 from io import BytesIO
 import pytest
 
+def test_acceptance_unicode_filename(client):
+    # Verifies the app accepts uploads with Unicode filenames.
+    img_data = BytesIO(b"fake_image_data")
+    img_data.name = "测试_áéíóú.jpg"
+    resp = client.post(
+        "/prediction",
+        data={"file": (img_data, img_data.name)},
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code == 200
+    assert b"Prediction" in resp.data
+
+def test_acceptance_response_schema_keys(client):
+    # Confirms response contains stable keys like prediction and optionally confidence.
+    img_data = BytesIO(b"fake_image_data")
+    img_data.name = "schema.jpg"
+    resp = client.post(
+        "/prediction",
+        data={"file": (img_data, img_data.name)},
+        content_type="multipart/form-data",
+        headers={"Accept": "application/json"},
+    )
+    assert resp.status_code == 200
+    # If JSON is returned, check keys; if HTML, at least ensure Prediction token exists.
+    ct = resp.headers.get("Content-Type", "")
+    if "application/json" in ct:
+        payload = resp.get_json()
+        assert "prediction" in payload
+    else:
+        assert b"Prediction" in resp.data
+
 def test_acceptance_successful_upload(client):
     """
     Test Case: Successful Upload of a Valid Image File

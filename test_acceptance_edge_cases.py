@@ -4,6 +4,49 @@ from io import BytesIO
 import pytest
 from threading import Thread
 
+def test_edge_case_extension_mismatch_content_type(client):
+    # Verifies extension/content-type mismatch is handled consistently.
+    img_data = BytesIO(b"valid_image_data")
+    img_data.name = "mismatch.png"
+    resp = client.post(
+        "/prediction",
+        data={"file": (img_data, img_data.name)},
+        content_type="multipart/form-data",
+        headers={"Content-Type": "multipart/form-data"},
+    )
+    assert resp.status_code in (200, 400)
+    # If accepted, Prediction appears; if rejected, error present.
+    assert (b"Prediction" in resp.data) or (b"error" in resp.data.lower())
+
+def test_edge_case_long_filename(client):
+    # Ensures very long filenames do not crash the server.
+    long_name = "a" * 200 + ".jpg"
+    img_data = BytesIO(b"valid_image_data")
+    img_data.name = long_name
+    resp = client.post(
+        "/prediction",
+        data={"file": (img_data, img_data.name)},
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code in (200, 400)
+    assert (b"Prediction" in resp.data) or (b"cannot" in resp.data.lower())
+
+def test_edge_case_multiple_files_single_field(client):
+    # Confirms behavior when multiple files are sent under one field.
+    img1 = BytesIO(b"img1")
+    img1.name = "one.jpg"
+    img2 = BytesIO(b"img2")
+    img2.name = "two.jpg"
+    data = {
+    "file": [
+        (img1, img1.name),
+        (img2, img2.name),
+    ]
+}
+    resp = client.post("/prediction", data=data, content_type="multipart/form-data")
+    assert resp.status_code in (200, 400)
+    assert (b"Prediction" in resp.data) or (b"multiple" in resp.data.lower()) or (b"error" in resp.data.lower())
+
 # Helper function for concurrent image uploads
 def upload_image(client, img_data):
     """

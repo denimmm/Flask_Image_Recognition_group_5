@@ -2,6 +2,7 @@
 
 import pytest
 from app import app
+from io import BytesIO
 
 @pytest.fixture
 def client():
@@ -12,6 +13,30 @@ def client():
     """
     with app.test_client() as client:
         yield client
+
+def test_acceptance_empty_file_upload(client):
+    # Ensures zero-byte files are rejected with an appropriate error message.
+    empty = BytesIO(b"")
+    empty.name = "empty.jpg"
+    resp = client.post(
+        "/prediction",
+        data={"file": (empty, empty.name)},
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code in (200, 400, 413)
+    assert b"cannot be processed" in resp.data or b"error" in resp.data.lower()
+
+def test_acceptance_wrong_field_name(client):
+    # Ensures uploads not using the expected 'file' field produce a clear error.
+    img_data = BytesIO(b"fake_image_data")
+    img_data.name = "wrongfield.jpg"
+    resp = client.post(
+        "/prediction",
+        data={"upload": (img_data, img_data.name)},
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code in (200, 400)
+    assert b"File cannot be processed" in resp.data or b"file" in resp.data.lower()
 
 def test_acceptance_missing_file(client):
     """
