@@ -1,21 +1,21 @@
-#lint.py 
+#lint.py
 
-import sys 
+import sys
 
-from pylint import lint  
+from pylint import lint
 
-THRESHOLD = 9  
+THRESHOLD = 9
 
 run = lint.Run(["app.py"])
 
 
-score = run.linter.stats["global_note"]  
+score = run.linter.stats["global_note"]
 
-if score < THRESHOLD: 
+if score < THRESHOLD:
 
-    print("Linter failed: Score < threshold value") 
+    print("Linter failed: Score < threshold value")
 
-    sys.exit(1) 
+    sys.exit(1)
 
 
-sys.exit(0) 
+sys.exit(0)

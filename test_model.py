@@ -1,17 +1,21 @@
-import os
+"""Unit tests for model loading and prediction logic."""
+
+# Third-party
 import pytest
 from io import BytesIO
 from PIL import Image
 import numpy as np
-from keras.models import load_model
-from model import preprocess_img, predict_result  # Adjust based on your structure
 
-# Load the model before tests run
+# Your own modules
+from model import load_model, preprocess_image, predict_result
+
+
+# Load the model once for all tests
 @pytest.fixture(scope="module")
-def model():
-    """Load the model once for all tests."""
-    model = load_model("digit_model.h5")  # Adjust path as needed
-    return model
+def model_instance():
+    """Load the ML model once before running tests."""
+    return load_model("digit_model.h5")  # Adjust path as needed
+
 
 def test_preprocess_img_accepts_pil_image():
     # Verifies preprocess_img can accept a PIL Image object and produce the expected normalized shape.
@@ -72,56 +76,53 @@ def test_predict_result_output_type(model, tmp_path):
 
 # Basic Tests
 
-def test_preprocess_img():
-    """Test the preprocess_img function."""
+def test_preprocess_image():
+    """Test the preprocess_image function for shape and normalization."""
     img_path = "test_images/2/Sign 2 (97).jpeg"
-    processed_img = preprocess_img(img_path)
+    processed_img_local = preprocess_image(img_path)
 
-    # Check that the output shape is as expected
-    assert processed_img.shape == (1, 224, 224, 3), "Processed image shape should be (1, 224, 224, 3)"
+    assert processed_img_local.shape == (1, 224, 224, 3), (
+        "Processed image shape should be (1, 224, 224, 3)"
+    )
 
-    # Check that values are normalized (between 0 and 1)
-    assert np.min(processed_img) >= 0 and np.max(processed_img) <= 1, "Image pixel values should be normalized between 0 and 1"
+    assert np.min(processed_img_local) >= 0 and np.max(processed_img_local) <= 1, (
+        "Image pixel values should be normalized"
+    )
 
 
-def test_predict_result(model):
-    """Test the predict_result function."""
-    img_path = "test_images/4/Sign 4 (92).jpeg"  # Ensure the path is correct
-    processed_img = preprocess_img(img_path)
+def test_predict_result(model_instance):
+    """Test the predict_result function for correct output type."""
+    img_path = "test_images/4/Sign 4 (92).jpeg"
+    processed_img_local = preprocess_image(img_path)
 
-    # Make a prediction
-    prediction = predict_result(processed_img)
-
-    # Print the prediction for debugging
-    print(f"Prediction: {prediction} (Type: {type(prediction)})")
-
-    # Check that the prediction is an integer (convert if necessary)
-    assert isinstance(prediction, (int, np.integer)), "Prediction should be an integer class index"
+    prediction_local = predict_result(model_instance, processed_img_local)
+    assert isinstance(prediction_local, (int, np.integer)), (
+        "Prediction should be an integer class index"
+    )
 
 
 # Advanced Tests
 
 def test_invalid_image_path():
-    """Test preprocess_img with an invalid image path."""
+    """Test preprocess_image with an invalid image path raises FileNotFoundError."""
     with pytest.raises(FileNotFoundError):
-        preprocess_img("invalid/path/to/image.jpeg")
+        preprocess_image("invalid/path/to/image.jpeg")
 
-def test_image_shape_on_prediction(model):
-    """Test the prediction output shape."""
-    img_path = "test_images/5/Sign 5 (86).jpeg"  # Ensure the path is correct
-    processed_img = preprocess_img(img_path)
 
-    # Ensure that the prediction output is an integer
-    prediction = predict_result(processed_img)
-    assert isinstance(prediction, (int, np.integer)), "The prediction should be an integer"
+def test_image_shape_on_prediction(model_instance):
+    """Test that predict_result returns an integer for a valid image."""
+    img_path = "test_images/5/Sign 5 (86).jpeg"
+    processed_img_local = preprocess_image(img_path)
+    prediction_local = predict_result(model_instance, processed_img_local)
+    assert isinstance(prediction_local, (int, np.integer)), "Prediction should be an integer"
 
-def test_model_predictions_consistency(model):
-    """Test that predictions for the same input are consistent."""
+
+def test_model_predictions_consistency(model_instance):
+    """Test that predictions for the same input are consistent across multiple runs."""
     img_path = "test_images/7/Sign 7 (54).jpeg"
-    processed_img = preprocess_img(img_path)
+    processed_img_local = preprocess_image(img_path)
 
-    # Make multiple predictions
-    predictions = [predict_result(processed_img) for _ in range(5)]
-
-    # Check that all predictions are the same
-    assert all(p == predictions[0] for p in predictions), "Predictions for the same input should be consistent"
+    predictions_local = [predict_result(model_instance, processed_img_local) for _ in range(5)]
+    assert all(p == predictions_local[0] for p in predictions_local), (
+        "Predictions should be consistent for the same input"
+    )
