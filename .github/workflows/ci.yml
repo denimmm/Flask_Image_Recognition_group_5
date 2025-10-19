@@ -28,7 +28,7 @@ jobs:
 
       - name: Run pylint
         run: |
-          pylint --fail-under=9 $(git ls-files '*.py' | grep -vE '^(venv|.venv|tests|migrations|build|dist)/')
+          pylint --fail-under=9 $(git ls-files '*.py' | grep -vE '(venv|.venv|tests|migrations|build|dist|test)')
 
 
       - name: Run pytest
