@@ -5,3 +5,4 @@ Pillow==9.3.0
 tensorflow==2.10.0
 pytest==8.3.3
 pylint==3.3.9
+Werkzeug==2.2.3
