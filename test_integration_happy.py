@@ -5,7 +5,7 @@ import pytest
 import time
 
 def test_integration_repeat_same_image_consistent(client):
-    # Ensures predictions for the same image across requests are consistent.
+    """Ensures predictions for the same image across requests are consistent."""
     buf = BytesIO(b"fake_image_data_consistent")
     buf.name = "same.jpg"
     r1 = client.post(

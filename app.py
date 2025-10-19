@@ -5,7 +5,7 @@ from flask import Flask, render_template, request
 from PIL import UnidentifiedImageError
 
 # Your own modules
-from model import preprocess_image, predict_result, load_model
+from model import preprocess_img, predict_result, load_model
 
 # Instantiating Flask app
 app = Flask(__name__)
@@ -27,8 +27,8 @@ def predict_image_file():
     """Process uploaded image, run prediction, and render results."""
     if request.method == 'POST':
         try:
-            processed_img = preprocess_image(request.files['file'].stream)
-            prediction_result = predict_result(model, processed_img)
+            processed_img = preprocess_img(request.files['file'].stream)
+            prediction_result = predict_result(processed_img)
             return render_template("result.html", predictions=str(prediction_result))
 
         except (FileNotFoundError, UnidentifiedImageError) as e:

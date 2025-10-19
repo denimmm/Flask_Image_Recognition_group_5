@@ -15,7 +15,7 @@ def client():
         yield client
 
 def test_acceptance_empty_file_upload(client):
-    # Ensures zero-byte files are rejected with an appropriate error message.
+    """Ensures zero-byte files are rejected with an appropriate error message."""
     empty = BytesIO(b"")
     empty.name = "empty.jpg"
     resp = client.post(
@@ -27,7 +27,7 @@ def test_acceptance_empty_file_upload(client):
     assert b"cannot be processed" in resp.data or b"error" in resp.data.lower()
 
 def test_acceptance_wrong_field_name(client):
-    # Ensures uploads not using the expected 'file' field produce a clear error.
+    """Ensures uploads not using the expected 'file' field produce a clear error."""
     img_data = BytesIO(b"fake_image_data")
     img_data.name = "wrongfield.jpg"
     resp = client.post(

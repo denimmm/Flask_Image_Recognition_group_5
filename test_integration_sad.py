@@ -11,7 +11,7 @@ def client():
         yield client
 
 def test_integration_corrupt_image(client):
-    # Ensures corrupt uploads return a handled error rather than crashing.
+    """Ensures corrupt uploads return a handled error rather than crashing."""
     bad = BytesIO(b"\x00\x01\x02\x03\x04corrupt")
     bad.name = "bad.jpg"
     resp = client.post(

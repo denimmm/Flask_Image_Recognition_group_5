@@ -5,7 +5,7 @@ import pytest
 from threading import Thread
 
 def test_edge_case_extension_mismatch_content_type(client):
-    # Verifies extension/content-type mismatch is handled consistently.
+    """Verifies extension/content-type mismatch is handled consistently."""
     img_data = BytesIO(b"valid_image_data")
     img_data.name = "mismatch.png"
     resp = client.post(
@@ -19,7 +19,7 @@ def test_edge_case_extension_mismatch_content_type(client):
     assert (b"Prediction" in resp.data) or (b"error" in resp.data.lower())
 
 def test_edge_case_long_filename(client):
-    # Ensures very long filenames do not crash the server.
+    """Ensures very long filenames do not crash the server."""
     long_name = "a" * 200 + ".jpg"
     img_data = BytesIO(b"valid_image_data")
     img_data.name = long_name
@@ -32,7 +32,7 @@ def test_edge_case_long_filename(client):
     assert (b"Prediction" in resp.data) or (b"cannot" in resp.data.lower())
 
 def test_edge_case_multiple_files_single_field(client):
-    # Confirms behavior when multiple files are sent under one field.
+    """Confirms behavior when multiple files are sent under one field."""
     img1 = BytesIO(b"img1")
     img1.name = "one.jpg"
     img2 = BytesIO(b"img2")

@@ -4,7 +4,7 @@ from io import BytesIO
 import pytest
 
 def test_acceptance_unicode_filename(client):
-    # Verifies the app accepts uploads with Unicode filenames.
+    """Verifies the app accepts uploads with Unicode filenames."""
     img_data = BytesIO(b"fake_image_data")
     img_data.name = "测试_áéíóú.jpg"
     resp = client.post(
@@ -16,7 +16,7 @@ def test_acceptance_unicode_filename(client):
     assert b"Prediction" in resp.data
 
 def test_acceptance_response_schema_keys(client):
-    # Confirms response contains stable keys like prediction and optionally confidence.
+    """Confirms response contains stable keys like prediction and optionally confidence."""
     img_data = BytesIO(b"fake_image_data")
     img_data.name = "schema.jpg"
     resp = client.post(

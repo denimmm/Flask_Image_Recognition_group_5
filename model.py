@@ -2,24 +2,13 @@
 
 # Third-party
 import numpy as np
-from keras.models import load_model as keras_load_model
+from keras.models import load_model
 from keras.utils import img_to_array
 from PIL import Image
 
+model = load_model("digit_model.h5")
 
-def load_model(path):
-    """Load and return the ML model from the given path.
-
-    Args:
-        path (str): Path to the saved model file (e.g., 'digit_model.h5').
-
-    Returns:
-        keras.Model: Loaded Keras model.
-    """
-    return keras_load_model(path)
-
-
-def preprocess_image(image):
+def preprocess_img(image):
     """Prepare an image for model prediction.
 
     Args:
@@ -35,12 +24,12 @@ def preprocess_image(image):
     return img_reshape
 
 
-def predict_result(model, image):
+def predict_result(image):
     """Predict the class label of a preprocessed image using the given model.
 
     Args:
         model (keras.Model): Loaded Keras model.
-        image (np.ndarray): Preprocessed image array (from preprocess_image).
+        image (np.ndarray): Preprocessed image array (from preprocess_img).
 
     Returns:
         int: Predicted class label as an integer.
