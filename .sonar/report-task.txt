@@ -1,0 +1,6 @@
+projectKey=flask_image_recognition
+serverUrl=http://localhost:9000
+serverVersion=25.10.0.114319
+dashboardUrl=http://localhost:9000/dashboard?id=flask_image_recognition
+ceTaskId=3d754554-ce2e-45bc-9360-314cfdebe45b
+ceTaskUrl=http://localhost:9000/api/ce/task?id=3d754554-ce2e-45bc-9360-314cfdebe45b
