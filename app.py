@@ -26,13 +26,19 @@ def main():
 def predict_image_file():
     """Process uploaded image, run prediction, and render results."""
     if request.method == 'POST':
+        # Validate file presence
+        if 'file' not in request.files:
+            error = "File cannot be processed."
+            return render_template("result.html", err=error)
+
         try:
-            processed_img = preprocess_img(request.files['file'].stream)
+            file_storage = request.files['file']
+            processed_img = preprocess_img(file_storage.stream)
             prediction_result = predict_result(processed_img)
             return render_template("result.html", predictions=str(prediction_result))
 
-        except (FileNotFoundError, UnidentifiedImageError) as e:
-            # Catch specific exceptions instead of all exceptions
+        except (FileNotFoundError, UnidentifiedImageError, KeyError) as e:
+            # Catch common file/processing errors and return a user-facing message
             error = f"File cannot be processed. Error: {e}"
             return render_template("result.html", err=error)
 
